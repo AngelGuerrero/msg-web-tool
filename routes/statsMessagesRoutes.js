@@ -4,7 +4,8 @@ const faker = require('faker')
 faker.locale = 'es'
 
 /**
- * Obtiene una colección.
+ * Obtiene una colección de mensajes ya sea enviados, no enviados,
+ * entregados y leídos, para mostrar en forma de gráfica y estadísticas.
  *
  * GET
  * */

@@ -48,7 +48,7 @@ app.use(logger('dev'))
  */
 
 app.use('/', indexRouter)
-app.use('/api/messages', messagesRouter)
-app.use('/api/stats/messages', statsMessagesRouter)
+app.use('/api/v1/messages', messagesRouter)
+app.use('/api/v1/stats/messages', statsMessagesRouter)
 
 module.exports = app
