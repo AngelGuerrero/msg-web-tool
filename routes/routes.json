@@ -1,0 +1,18 @@
+[
+  {
+    "route": "",
+    "path": "./routes/indexRoutes"
+  },
+  {
+    "route": "api/v1/routes",
+    "path": "./routes/listRoutes"
+  },
+  {
+    "route": "api/v1/messages",
+    "path": "./routes/sentMessagesRoutes"
+  },
+  {
+    "route": "api/v1/stats/messages",
+    "path": "./routes/statsMessagesRoutes"
+  }
+]

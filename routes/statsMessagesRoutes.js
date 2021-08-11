@@ -11,10 +11,14 @@ faker.locale = 'es'
  * */
 router.get('/', function (req, res) {
   const name = req.query.name || ''
+  const fromDate = req.query.fromDate || '2021-08-01'
+  const toDate = req.query.fromDate || '2021-08-07'
 
   const retval = {
     name,
-    series: []
+    series: [],
+    fromDate,
+    toDate
   }
 
   const LIMIT = faker.helpers.randomize([10])

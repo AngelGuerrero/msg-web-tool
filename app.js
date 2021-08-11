@@ -4,10 +4,6 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const cors = require('cors')
 
-const indexRouter = require('./routes/index')
-const messagesRouter = require('./routes/sentMessagesRoutes')
-const statsMessagesRouter = require('./routes/statsMessagesRoutes')
-
 const app = express()
 
 /**
@@ -47,8 +43,9 @@ app.use(logger('dev'))
  * Routes
  */
 
-app.use('/', indexRouter)
-app.use('/api/v1/messages', messagesRouter)
-app.use('/api/v1/stats/messages', statsMessagesRouter)
+const routes = require('./routes/routes.json')
+routes.forEach(({ route, path }) => app.use('/' + route, require(path)))
+
+// console.log(JSON.stringify(routes, null, 4))
 
 module.exports = app

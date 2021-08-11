@@ -69,7 +69,7 @@ router.get('/', function (req, res) {
       mensaje: faker.lorem.sentence(),
       fecha: faker.helpers.randomize(dates),
       costo: faker.finance.amount(),
-      estado: faker.helpers.randomize(['aprovado', 'denegado', 'pendiente'])
+      estado: faker.helpers.randomize(['Leído', 'Entregado', 'Enviado'])
     })
   }
 
