@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
 const logger = require('morgan')
 const cors = require('cors')
 
@@ -38,6 +39,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(cookieParser())
 app.use(logger('dev'))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 /**
  * Routes
