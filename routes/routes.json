@@ -14,5 +14,9 @@
   {
     "route": "api/v1/stats/messages",
     "path": "./routes/statsMessagesRoutes"
+  },
+  {
+    "route": "api/v1/integrations/apikeys",
+    "path": "./routes/apiKeysRoutes"
   }
 ]
