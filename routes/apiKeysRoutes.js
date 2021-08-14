@@ -81,4 +81,33 @@ router.put('/:id', function (req, res) {
   res.status(200).json(item)
 })
 
+/**
+ * Elimina una api key.
+ *
+ * DELETE
+ */
+router.delete('/:id', function (req, res) {
+  const id = _.toInteger(req.params.id)
+
+  const index = _.findIndex(list, { id })
+
+  if (index === -1) {
+    return res.status(404).json({
+      error: true,
+      data: [],
+      message: 'Recurso no encontrado',
+      code: 404
+    })
+  }
+
+  // Elimina el elemento
+  list.splice(index, 1)
+
+  res.status(200).json({
+    error: false,
+    message: 'Recurso eliminado satisfactoriamente',
+    code: 200
+  })
+})
+
 module.exports = router
