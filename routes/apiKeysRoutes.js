@@ -3,29 +3,27 @@ const router = Router()
 const faker = require('faker')
 faker.locale = 'es_MX'
 const moment = require('moment')
+const _ = require('lodash')
 
-const LIMIT_RESULTS = 2
+const LIMIT_RESULTS = 1
 
 //
 // Lista que actua como base de datos temporal.
 const list = []
 
-const getApiKeys = () => {
-  for (let i = 0; i < LIMIT_RESULTS; i++) {
-    list.push({
-      id: i,
-      nombre: faker.name.title(),
-      key: faker.git.commitSha(),
-      secret: faker.git.commitSha(),
-      fecha_creacion: moment(new Date()).format(),
-      habilitada: faker.helpers.randomize([true, false])
-    })
-  }
+const getItem = () => ({
+  id: _.toNumber(list.length + 1),
+  nombre: faker.name.title(),
+  key: faker.git.commitSha(),
+  secret: faker.git.branch(),
+  fecha_creacion: moment(new Date()).format(),
+  habilitada: faker.helpers.randomize([true, false])
+})
 
-  return list
-}
-
-getApiKeys()
+Array.from({ length: LIMIT_RESULTS }, (_, i) => i).reduce(
+  _ => list.push({ ...getItem() }),
+  list
+)
 
 /**
  * Obtiene una colección de registros de mensajes enviados.
@@ -44,16 +42,41 @@ router.get('/', function (req, res) {
 router.post('/', function (req, res) {
   const { nombre } = req.body
 
-  const item = {
-    id: list[list.length - 1].id + 1,
-    nombre,
-    key: faker.git.commitSha(),
-    secret: faker.git.commitSha(),
-    fecha_creacion: moment(new Date()).format(),
-    habilitada: true
-  }
+  const item = { ...getItem(), nombre, habilitada: true }
 
   list.push(item)
+
+  res.status(200).json(item)
+})
+
+/**
+ * Edita una api key
+ *
+ * PUT
+ */
+router.put('/:id', function (req, res) {
+  const id = _.toInteger(req.params.id)
+
+  const { nombre } = req.body
+
+  const index = _.findIndex(list, { id })
+
+  if (index === -1) {
+    return res.status(404).json({
+      error: true,
+      data: [],
+      message: 'Recurso no encontrado',
+      code: 404
+    })
+  }
+
+  //
+  // Establece los nuevos valores
+  const item = list[index]
+  item.nombre = nombre
+
+  // Guarda los cambios
+  list.splice(index, 1, item)
 
   res.status(200).json(item)
 })
