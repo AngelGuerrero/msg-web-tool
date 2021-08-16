@@ -57,7 +57,10 @@ router.post('/', function (req, res) {
 router.put('/:id', function (req, res) {
   const id = _.toInteger(req.params.id)
 
-  const { nombre } = req.body
+  const { nombre, habilitada } = req.body
+
+  console.log('nombre :>> ', nombre)
+  console.log('habilitada :>> ', habilitada)
 
   const index = _.findIndex(list, { id })
 
@@ -73,7 +76,8 @@ router.put('/:id', function (req, res) {
   //
   // Establece los nuevos valores
   const item = list[index]
-  item.nombre = nombre
+  item.nombre = nombre || item.nombre
+  item.habilitada = habilitada !== undefined ? habilitada : item.habilitada
 
   // Guarda los cambios
   list.splice(index, 1, item)
