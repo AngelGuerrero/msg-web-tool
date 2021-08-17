@@ -18,5 +18,9 @@
   {
     "route": "api/v1/integrations/apikeys",
     "path": "./routes/apiKeysRoutes"
+  },
+  {
+    "route": "api/v1/integrations/urlack",
+    "path": "./routes/urlAckRoutes"
   }
 ]

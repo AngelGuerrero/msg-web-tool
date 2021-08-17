@@ -7,9 +7,25 @@ const _ = require('lodash')
 
 const LIMIT_RESULTS = 1
 
-//
-// Lista que actua como base de datos temporal.
+/**
+ * Lista que actua como base de datos temporal.
+ */
 const list = []
+
+/**
+ * Item URL ACK de la actual instancia del servidor.
+ *
+ * Nota: Está definida como una lista porque posteriormente se
+ * consultará en base al id del usuario para hacer match.
+ */
+const urlAckList = [
+  {
+    id: null,
+    url: '',
+    habilitada: false,
+    userId: null
+  }
+]
 
 const getItem = () => ({
   id: _.toNumber(list.length + 1),
@@ -58,9 +74,6 @@ router.put('/:id', function (req, res) {
   const id = _.toInteger(req.params.id)
 
   const { nombre, habilitada } = req.body
-
-  console.log('nombre :>> ', nombre)
-  console.log('habilitada :>> ', habilitada)
 
   const index = _.findIndex(list, { id })
 
@@ -112,6 +125,79 @@ router.delete('/:id', function (req, res) {
     message: 'Recurso eliminado satisfactoriamente',
     code: 200
   })
+})
+
+const findOrFailUrlAck = (prop, value, { req, res }) => {
+  console.log('prop :>> ', prop)
+  console.log('value :>> ', value)
+
+  const index = _.findIndex(urlAckList, [[prop], value])
+
+  if (index === -1) {
+    return res.status(404).json({
+      error: true,
+      data: [],
+      message: 'Recurso no encontrado',
+      code: 404
+    })
+  }
+
+  return urlAckList[index]
+}
+
+/**
+ * Obtiene la información de la ruta URL ACK.
+ */
+router.get('/url-ack/:id', function (req, res) {
+  // const { userId } = req.body
+  const { userId } = req.params.id
+
+  // const index = _.findIndex(urlAckList, { userId })
+
+  // if (index === -1) {
+  //   return res.status(404).json({
+  //     error: true,
+  //     data: [],
+  //     message: 'Recurso no encontrado',
+  //     code: 404
+  //   })
+  // }
+
+  const item = findOrFailUrlAck('userId', userId, { req, res })
+
+  // res.status(200).json(urlAckList[index])
+  res.status(200).json(item)
+})
+
+/**
+ * Ruta para actualizar la URL ACK de entrega y confirmación.
+ */
+router.put('/url-ack/:id', function (req, res) {
+  const id = _.toInteger(req.params.id)
+
+  const { url, habilitada } = req.body
+
+  const index = _.findIndex(urlAckList, { id })
+
+  if (index === -1) {
+    return res.status(404).json({
+      error: true,
+      data: [],
+      message: 'Recurso no encontrado',
+      code: 404
+    })
+  }
+
+  //
+  // Establece los nuevos valores
+  const item = list[index]
+  item.url = url || item.url
+  item.habilitada = habilitada !== undefined ? habilitada : item.habilitada
+
+  // Guarda los cambios
+  list.splice(index, 1, item)
+
+  res.status(200).json(item)
 })
 
 module.exports = router
