@@ -24,8 +24,8 @@ module.exports = (() => {
       sessions.push(user)
     },
 
-    removeFromSession: function (user) {
-      sessions = sessions.filter(e => e.id !== user.id)
+    removeFromSession: function (id) {
+      sessions = sessions.filter(e => e.id !== id)
     }
   }
 })()

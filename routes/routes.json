@@ -8,6 +8,10 @@
     "path": "./routes/listRoutes"
   },
   {
+    "route": "api/v1/stats",
+    "path": "./routes/statsRoutes"
+  },
+  {
     "route": "api/v1/messages",
     "path": "./routes/sentMessagesRoutes"
   },
