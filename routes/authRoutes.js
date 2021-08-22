@@ -4,12 +4,15 @@ const router = Router()
 const _ = require('lodash')
 const users = require('../models/users')
 const sessions = require('../models/sessions')
+const { UserFactory } = require('../models/user')
+const userFactory = new UserFactory()
 
 const isRegister = (prop, value) => {
-  const item = _.find(users.getUsers(), [prop, value])
-  if (!item) return { registered: false, message: 'Usuario no registrado' }
+  // const item = _.find(users.getUsers(), [prop, value])
+  const index = _.findIndex(users.getUsers(), [prop, value])
+  if (index === -1) return { registered: false, message: 'Usuario no registrado' }
 
-  return { registered: true, item }
+  return { registered: true, item: users[index], index }
 }
 
 const hasSession = (prop, value) => {
@@ -21,28 +24,28 @@ const hasSession = (prop, value) => {
 }
 
 /**
+ * me
+ *
  * GET
  */
 router.get('/me/:id', function (req, res) {
   const id = _.toInteger(req.params.id)
 
-  let item
+  let index
   let message
   let registered
   let activeSession;
 
-  ({ registered, message, item } = isRegister('id', id))
+  ({ registered, message, index } = isRegister('id', id))
   if (!registered) return res.status(404).json({ error: true, message });
 
   ({ activeSession, message } = hasSession('id', id))
   if (!activeSession) return res.status(401).json({ error: true, message })
 
-  console.log('users.getUsers() :>> ', users.getUsers())
-  console.log('sessions.getSessions() :>> ', sessions.getSessions())
-  //
-  // Elimina la información delicada
-  const user = _.clone(item)
-  delete user.password
+  // console.log('users.getUsers() :>> ', users.getUsers())
+  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
+
+  const user = users.getUsers()[index].getUser()
 
   return res
     .status(200)
@@ -53,6 +56,8 @@ router.get('/me/:id', function (req, res) {
 })
 
 /**
+ * register
+ *
  * POST
  */
 router.post('/register', function (req, res) {
@@ -71,25 +76,22 @@ router.post('/register', function (req, res) {
       .json({ error: true, message: 'Este email ya está registrado' })
   }
 
-  // TODO: Encriptar y desencriptar password sería un plus
-  const user = {
-    id: _.toInteger(users.getUsers().length + 1),
-    nombre,
-    email,
-    password
-  }
+  const id = _.toInteger(users.getUsers().length + 1)
+  const user = userFactory.createUser(id, nombre, email, password)
 
   users.addUser(user)
   sessions.addToSession(user)
-  console.log('users.getUsers() :>> ', users.getUsers())
-  console.log('sessions.getSessions() :>> ', sessions.getSessions())
+  // console.log('users.getUsers() :>> ', users.getUsers())
+  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   return res
     .status(201)
-    .json({ data: user, message: 'Usuario correctamente registrado' })
+    .json({ data: user.getUser(), message: 'Usuario correctamente registrado' })
 })
 
 /**
+ * login
+ *
  * POST
  */
 router.post('/login', function (req, res) {
@@ -106,12 +108,12 @@ router.post('/login', function (req, res) {
       .json({ error: true, message: 'El password es requerido.' })
   }
 
-  let item
+  let index
   let message
   let registered
   let activeSession;
 
-  ({ registered, message, item } = isRegister('email', email))
+  ({ registered, message, index } = isRegister('email', email))
   if (!registered) {
     return res
       .status(404)
@@ -119,27 +121,31 @@ router.post('/login', function (req, res) {
   }
 
   ({ activeSession, message } = hasSession('email', email))
-  const user = _.clone(item)
-  delete user.password
+  const user = users.getUsers()[index].getUser()
   if (activeSession) {
     return res
       .status(200)
       .json({ error: false, data: user, message: 'El usuario ya está autenticado' })
   }
 
-  if (item.password !== password) {
+  if (!users.getUsers()[index].matchPassword(password)) {
     return res
       .status(401)
       .json({ error: true, message: 'El email o password son incorrectos' })
   }
 
-  sessions.addToSession(item)
-  console.log('users.getUsers() :>> ', users.getUsers())
-  console.log('sessions.getSessions() :>> ', sessions.getSessions())
+  sessions.addToSession(user)
+  // console.log('users.getUsers() :>> ', users.getUsers())
+  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   res.status(201).json({ data: user, message: 'Sesión iniciada corectamente' })
 })
 
+/**
+ * logout
+ *
+ * POST
+ */
 router.post('/logout', function (req, res) {
   const { id } = req.body
 
@@ -151,12 +157,62 @@ router.post('/logout', function (req, res) {
   }
 
   sessions.removeFromSession(id)
-  console.log('users.getUsers() :>> ', users.getUsers())
-  console.log('sessions.getSessions() :>> ', sessions.getSessions())
+  // console.log('users.getUsers() :>> ', users.getUsers())
+  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   return res
     .status(200)
     .json({ message: 'Sesión cerrada correctamente' })
+})
+
+/**
+ * forget-password
+ *
+ * Cuando un usuario olvida una contraseña entonces manda un correo para la recuperación
+ * de la misma, se genera internamente un token que se comparte al enlace cuando el usuario
+ * recibe el correo de recuperación de contraseña, junto con su email.
+ *
+ * Ésto para hacer la validación de cambio de contraseña y saber a qué usuario corresponde.
+ *
+ * POST
+ */
+router.post('/forget-password', async (req, res) => {
+  const { email } = req.body
+
+  const { registered, index } = isRegister('email', email)
+  if (!registered) {
+    return res
+      .status(404)
+      .json({ error: true, message: `El usuario con el email '${email}' no está registrado` })
+  }
+
+  //
+  // Se manda un email para la recuperación de contraseña
+  const { error, message } = await users.getUsers()[index].forgotPassword()
+
+  return res
+    .status(error ? 409 : 200)
+    .json({ error, message })
+})
+
+/**
+ * Reset pass
+ */
+router.post('/reset-password', (req, res) => {
+  const { token, email, password } = req.body
+
+  const { registered, index } = isRegister('email', email)
+  if (!registered) {
+    return res
+      .status(404)
+      .json({ error: true, message: `El usuario con el email ${email} no está registrado` })
+  }
+
+  const { error, message } = users.getUsers()[index].changePasswordUsingToken(token, password)
+
+  return res
+    .status(error ? 500 : 200)
+    .json({ error, message })
 })
 
 module.exports = router

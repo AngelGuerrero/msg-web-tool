@@ -22,6 +22,10 @@ module.exports = (() => {
 
     addUser: function (user) {
       users.push(user)
+    },
+
+    findAndReplace: function (id, item) {
+
     }
   }
 })()
