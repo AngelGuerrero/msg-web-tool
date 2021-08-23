@@ -45,4 +45,35 @@ router.put('/:id', function (req, res) {
     .json({ data: item, message })
 })
 
+/**
+ * Actualiza la contraseña de un usuario
+ *
+ * PUT
+ */
+router.put('/:id/password', function (req, res) {
+  const id = _.toInteger(req.params.id)
+
+  const { old_password, password } = req.body
+
+  const { registered, index } = users.isRegister('id', id)
+  if (!registered) {
+    return res
+      .status(404)
+      .json({ error: true, message: `El usuario con el id '${id}' no está registrado` })
+  }
+
+  const match = users.getUsers()[index].matchPassword(old_password)
+  if (!match) {
+    return res
+      .status(422)
+      .json({ error: true, message: 'La contraseña ingresada no coincide con la contraseña actual' })
+  }
+
+  const { error, message } = users.getUsers()[index].setPassword(password)
+
+  return res
+    .status(200)
+    .json({ error, message })
+})
+
 module.exports = router

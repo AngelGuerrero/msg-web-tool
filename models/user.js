@@ -55,7 +55,7 @@ const UserFactory = function () {
 
     user.setPassword = function (password) {
       this.password = password
-      return { error: false, message: 'Password updated successfully' }
+      return { error: false, message: 'Contraseña actualizada correctamente' }
     }
 
     user.changePasswordUsingToken = function (token, password) {
