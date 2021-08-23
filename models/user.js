@@ -5,6 +5,13 @@ const User = function (id, nombre, email, password) {
   this.id = id
   this.nombre = nombre
   this.email = email
+  this.direccion = ''
+  this.ciudad = ''
+  this.estado = ''
+  this.telefono = ''
+  this.pais = ''
+  this.usar_informacion = true
+
   this.password = password
 
   this.requestedRecoverPassword = false
@@ -16,7 +23,30 @@ const UserFactory = function () {
     const user = new User(id, nombre, email, password)
 
     user.getUser = function () {
-      return { id: this.id, nombre: this.nombre, email: this.email }
+      return {
+        id: this.id,
+        nombre: this.nombre,
+        email: this.email,
+        direccion: this.direccion,
+        ciudad: this.ciudad,
+        estado: this.estado,
+        telefono: this.telefono,
+        pais: this.pais,
+        usar_informacion: this.usar_informacion
+      }
+    }
+
+    user.setUser = function (nombre, email, direccion, ciudad, estado, telefono, pais, usarInformacion) {
+      this.nombre = nombre
+      this.email = email
+      this.direccion = direccion
+      this.ciudad = ciudad
+      this.estado = estado
+      this.telefono = telefono
+      this.pais = pais
+      this.usar_informacion = usarInformacion
+
+      return { item: this.getUser(), message: `Usuario '${this.nombre}' actualizado correctamente` }
     }
 
     user.matchPassword = function (password) {

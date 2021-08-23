@@ -8,7 +8,6 @@ const { UserFactory } = require('../models/user')
 const userFactory = new UserFactory()
 
 const isRegister = (prop, value) => {
-  // const item = _.find(users.getUsers(), [prop, value])
   const index = _.findIndex(users.getUsers(), [prop, value])
   if (index === -1) return { registered: false, message: 'Usuario no registrado' }
 

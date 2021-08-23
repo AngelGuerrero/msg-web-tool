@@ -7,6 +7,9 @@
 	"settings": {
 		"editor.defaultFormatter": "classineslint.vscode-eslint",
 		"editor.formatOnSaveMode": "modifications",
-		"editor.formatOnSave": true
+		"editor.formatOnSave": true,
+		"workbench.activityBar.visible": true,
+		"workbench.colorTheme": "Default High Contrast",
+		"workbench.editor.highlightModifiedTabs": true
 	}
 }

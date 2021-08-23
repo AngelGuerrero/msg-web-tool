@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 module.exports = (() => {
   let instance = null
 
@@ -24,8 +26,12 @@ module.exports = (() => {
       users.push(user)
     },
 
-    findAndReplace: function (id, item) {
+    isRegister: function (prop, value) {
+      const index = _.findIndex(this.getUsers(), [prop, value])
 
+      if (index === -1) return { registered: false, message: 'Usuario no registrado' }
+
+      return { registered: true, item: this.getUsers()[index], index }
     }
   }
 })()
