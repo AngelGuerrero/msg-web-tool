@@ -128,9 +128,6 @@ router.delete('/:id', function (req, res) {
 })
 
 const findOrFailUrlAck = (prop, value, { req, res }) => {
-  console.log('prop :>> ', prop)
-  console.log('value :>> ', value)
-
   const index = _.findIndex(urlAckList, [[prop], value])
 
   if (index === -1) {
@@ -147,30 +144,21 @@ const findOrFailUrlAck = (prop, value, { req, res }) => {
 
 /**
  * Obtiene la información de la ruta URL ACK.
+ *
+ * GET
  */
 router.get('/url-ack/:id', function (req, res) {
-  // const { userId } = req.body
   const { userId } = req.params.id
-
-  // const index = _.findIndex(urlAckList, { userId })
-
-  // if (index === -1) {
-  //   return res.status(404).json({
-  //     error: true,
-  //     data: [],
-  //     message: 'Recurso no encontrado',
-  //     code: 404
-  //   })
-  // }
 
   const item = findOrFailUrlAck('userId', userId, { req, res })
 
-  // res.status(200).json(urlAckList[index])
   res.status(200).json(item)
 })
 
 /**
  * Ruta para actualizar la URL ACK de entrega y confirmación.
+ *
+ * PUT
  */
 router.put('/url-ack/:id', function (req, res) {
   const id = _.toInteger(req.params.id)

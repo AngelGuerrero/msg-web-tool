@@ -7,13 +7,6 @@ const sessions = require('../models/sessions')
 const { UserFactory } = require('../models/user')
 const userFactory = new UserFactory()
 
-const isRegister = (prop, value) => {
-  const index = _.findIndex(users.getUsers(), [prop, value])
-  if (index === -1) return { registered: false, message: 'Usuario no registrado' }
-
-  return { registered: true, item: users[index], index }
-}
-
 const hasSession = (prop, value) => {
   const item = _.find(sessions.getSessions(), [prop, value])
 
@@ -35,14 +28,11 @@ router.get('/me/:id', function (req, res) {
   let registered
   let activeSession;
 
-  ({ registered, message, index } = isRegister('id', id))
+  ({ registered, message, index } = users.isRegister('id', id))
   if (!registered) return res.status(404).json({ error: true, message });
 
   ({ activeSession, message } = hasSession('id', id))
   if (!activeSession) return res.status(401).json({ error: true, message })
-
-  // console.log('users.getUsers() :>> ', users.getUsers())
-  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   const user = users.getUsers()[index].getUser()
 
@@ -68,7 +58,7 @@ router.post('/register', function (req, res) {
       .json({ error: true, message: 'Los datos son requeridos' })
   }
 
-  const { registered } = isRegister('email', email)
+  const { registered } = users.isRegister('email', email)
   if (registered) {
     return res
       .status(409)
@@ -80,8 +70,6 @@ router.post('/register', function (req, res) {
 
   users.addUser(user)
   sessions.addToSession(user)
-  // console.log('users.getUsers() :>> ', users.getUsers())
-  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   return res
     .status(201)
@@ -112,7 +100,7 @@ router.post('/login', function (req, res) {
   let registered
   let activeSession;
 
-  ({ registered, message, index } = isRegister('email', email))
+  ({ registered, message, index } = users.isRegister('email', email))
   if (!registered) {
     return res
       .status(404)
@@ -134,8 +122,6 @@ router.post('/login', function (req, res) {
   }
 
   sessions.addToSession(user)
-  // console.log('users.getUsers() :>> ', users.getUsers())
-  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   res.status(201).json({ data: user, message: 'Sesión iniciada corectamente' })
 })
@@ -156,8 +142,6 @@ router.post('/logout', function (req, res) {
   }
 
   sessions.removeFromSession(id)
-  // console.log('users.getUsers() :>> ', users.getUsers())
-  // console.log('sessions.getSessions() :>> ', sessions.getSessions())
 
   return res
     .status(200)
@@ -178,7 +162,7 @@ router.post('/logout', function (req, res) {
 router.post('/forget-password', async (req, res) => {
   const { email } = req.body
 
-  const { registered, index } = isRegister('email', email)
+  const { registered, index } = users.isRegister('email', email)
   if (!registered) {
     return res
       .status(404)
@@ -195,12 +179,12 @@ router.post('/forget-password', async (req, res) => {
 })
 
 /**
- * Reset pass
+ * Reset password
  */
 router.post('/reset-password', (req, res) => {
   const { token, email, password } = req.body
 
-  const { registered, index } = isRegister('email', email)
+  const { registered, index } = users.isRegister('email', email)
   if (!registered) {
     return res
       .status(404)
