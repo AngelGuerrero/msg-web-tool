@@ -14,7 +14,7 @@ router.get('/', function (req, res) {
   const fromDate = req.query.fromDate || '2021-08-01'
   const toDate = req.query.fromDate || '2021-08-07'
 
-  const retval = {
+  const returnValue = {
     name,
     series: [],
     fromDate,
@@ -24,10 +24,10 @@ router.get('/', function (req, res) {
   const LIMIT = faker.helpers.randomize([10])
 
   for (let i = 0; i < LIMIT; i++) {
-    retval.series.push(faker.helpers.randomize([575, 300, 890, 155, 640, 540, 800, 250, 230, 400, 630]))
+    returnValue.series.push(faker.helpers.randomize([575, 300, 890, 155, 640, 540, 800, 250, 230, 400, 630]))
   }
 
-  res.status(200).json(retval)
+  res.status(200).json(returnValue)
 })
 
 module.exports = router

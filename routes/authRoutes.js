@@ -1,4 +1,3 @@
-/* eslint-disable func-call-spacing */
 const { Router } = require('express')
 const router = Router()
 const _ = require('lodash')

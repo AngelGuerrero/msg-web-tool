@@ -10,6 +10,9 @@
 		"editor.formatOnSave": true,
 		"workbench.activityBar.visible": true,
 		"workbench.colorTheme": "Default High Contrast",
-		"workbench.editor.highlightModifiedTabs": true
+		"workbench.editor.highlightModifiedTabs": true,
+		"cSpell.words": [
+			"urlack"
+		]
 	}
 }

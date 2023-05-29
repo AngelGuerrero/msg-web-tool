@@ -11,10 +11,10 @@ const LIMIT_RESULTS = 30
  *
  * @param {Date} fromDate Fecha de inicio.
  * @param {Date} toDate Fecha fin.
- * @returns {Array} retval Contiene las fechas de los rangos seleccionados.
+ * @returns {Array} returnValue Contiene las fechas de los rangos seleccionados.
  */
 const getDatesFromRange = (fromDate, toDate) => {
-  const retval = []
+  const returnValue = []
 
   const start = moment(fromDate)
   const end = moment(toDate)
@@ -23,29 +23,25 @@ const getDatesFromRange = (fromDate, toDate) => {
 
   for (let i = daysNumber; i >= 0; i--) {
     const day = moment(toDate).subtract(daysNumber - i, 'days')
-    retval.push(day)
+    returnValue.push(day)
   }
 
-  // console.log(JSON.stringify(retval, null, 4))
-
-  return retval
+  return returnValue
 }
 
 /**
- * @returns {Array} retval Retorna un array con las fechas de los últimos 7 días.
+ * @returns {Array} returnValue Retorna un array con las fechas de los últimos 7 días.
  */
 const getDatesFromLastSevenDays = () => {
-  const retval = []
+  const returnValue = []
 
   for (let i = 7; i > 0; i--) {
     const date = new Date()
     const day = moment(date).subtract(i, 'days')
-    retval.push(day)
+    returnValue.push(day)
   }
 
-  // console.log(JSON.stringify(retval, null, 4))
-
-  return retval
+  return returnValue
 }
 
 /**
@@ -54,7 +50,7 @@ const getDatesFromLastSevenDays = () => {
  * GET
  * */
 router.get('/', function (req, res) {
-  const retval = []
+  const returnValue = []
 
   const fromDate = req.query.fromDate || null
   const toDate = req.query.toDate || null
@@ -62,7 +58,7 @@ router.get('/', function (req, res) {
   const dates = (fromDate && toDate) ? getDatesFromRange(fromDate, toDate) : getDatesFromLastSevenDays()
 
   for (let i = 0; i < LIMIT_RESULTS; i++) {
-    retval.push({
+    returnValue.push({
       id: i,
       token: faker.git.commitSha(),
       destinatario: faker.name.findName(),
@@ -73,7 +69,7 @@ router.get('/', function (req, res) {
     })
   }
 
-  res.status(200).json(retval)
+  res.status(200).json(returnValue)
 })
 
 router.post('/', function (req, res) {

@@ -35,7 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 // }
 
 /**
- * Middlewares
+ * Middleware
  */
 
 app.use(cookieParser())
@@ -49,6 +49,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 const routes = require('./routes/routes.json')
 routes.forEach(({ route, path }) => app.use('/' + route, require(path)))
 
-// console.log(JSON.stringify(routes, null, 4))
+console.log(JSON.stringify(routes, null, 4))
 
 module.exports = app
